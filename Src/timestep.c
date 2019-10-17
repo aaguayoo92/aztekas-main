@@ -116,7 +116,7 @@ double TimeStep()
    #if DIM == 1
    dt = cou*MIN(dx1,1000);
    #elif DIM == 2 || DIM == 4
-   dt = cou*MIN(dx1,dx2);
+   dt = cou*MIN(dx1,1.5*dx2);
    #endif 
 #endif
 
