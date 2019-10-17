@@ -40,7 +40,7 @@ void Initial()
       for(j = 0; j <= Nx2; j++)
       {
          local_grid.x[1] = grid.X1[i];
-         local_grid.x[2] = grid.X2[j];
+         local_grid.x[2] = M_PI_2;//grid.X2[j];
 
          Get_Metric_Components(&local_grid);
 

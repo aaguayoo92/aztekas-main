@@ -59,13 +59,13 @@ void Get_Metric_Components(gauge_ *local_grid)
    double theta = local_grid->x[2]; 
    double M = Black_Hole_Mass;
 
-   local_grid->lapse = sqrt(r/(2.0*M + r));
+   local_grid->lapse = sqrt(1.0 - 2.0*M/r);
 
-   local_grid->beta_con[0] = 2.0*M/(2.0*M + r);
+   local_grid->beta_con[0] = 0.0;
    local_grid->beta_con[1] = 0.0;
    local_grid->beta_con[2] = 0.0;
 
-   local_grid->gamma_con[0][0] = r/(2.0*M + r);
+   local_grid->gamma_con[0][0] = 1.0 - 2*M/r;
    local_grid->gamma_con[0][1] = 0.0;
    local_grid->gamma_con[0][2] = 0.0;
    local_grid->gamma_con[1][0] = 0.0;
@@ -75,7 +75,7 @@ void Get_Metric_Components(gauge_ *local_grid)
    local_grid->gamma_con[2][1] = 0.0;
    local_grid->gamma_con[2][2] = 1.0/(r*r*sin(theta)*sin(theta));
 
-   local_grid->dety = sqrt(r*r*r*sin(theta)*sin(theta)*(2.0*M + r));
+   local_grid->dety = pow(r,5.0/2.0)*fabs(sin(theta))*sqrt(1.0/(r - 2*M));
 
 #endif
 }
@@ -191,11 +191,11 @@ void Gauge_Derivatives(der_gauge_ *der, gauge_ *local_grid)
    double theta = local_grid->x[2]; 
    double M = Black_Hole_Mass;
 
-   der->dlapse[0] = M/(sqrt(r*pow(2.0*M + r,3.0)));
+   der->dlapse[0] = M/(pow(r,3.0/2.0)*sqrt(r - 2.0*M));
    der->dlapse[1] = 0.0;
    der->dlapse[2] = 0.0;
 
-   der->dbeta[0][0] = -2.0*M/pow(2.0*M + r,2.0);
+   der->dbeta[0][0] = 0.0;
    der->dbeta[0][1] = 0.0;
    der->dbeta[0][2] = 0.0;
    der->dbeta[1][0] = 0.0;
@@ -205,7 +205,7 @@ void Gauge_Derivatives(der_gauge_ *der, gauge_ *local_grid)
    der->dbeta[2][1] = 0.0;
    der->dbeta[2][2] = 0.0;
 
-   der->dgam[0][0][0] = -2.0*M/(r*r);
+   der->dgam[0][0][0] = -2.0*M/pow(2.0*M - r,2.0);
    der->dgam[0][0][1] = 0.0;
    der->dgam[0][0][2] = 0.0;
    der->dgam[0][1][0] = 0.0;

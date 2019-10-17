@@ -14,14 +14,17 @@ int Cons2Prim(double *u, double *q)
    int i, j, k;
    int count;
    double D, tau, S_cov[3], S_con[3];
+   double rho, p;
    double h, derh, f, derf;
-   double Lorentz, SS;
+   double F, dF;
+   double Lorentz, derLorentz, SS;
    double theta, theta_0;
+   double x, x_0, y, y_0;
    gauge_ local_grid;
    
 #if DIM == 1
 
-   for(i = 0; i <= Nx1-0; i++)
+   for(i = gc; i <= Nx1-0; i++)
    {
       local_grid.x[0] = grid.time;
       local_grid.x[1] = grid.X1[i];
@@ -51,31 +54,33 @@ int Cons2Prim(double *u, double *q)
       
       SS = S_cov[0]*S_con[0] + S_cov[1]*S_con[1] + S_cov[2]*S_con[2];
 
-      theta_0 = U(1,i)/U(0,i);
-      f       = 1.0;
-      count   = 0;
+      h = 1.0 + U(PRE,i)*K/(U(RHO,i)*(K - 1.0));
+      Lorentz = sqrt(1.0 + SS/(D*D*h*h));
+      x_0 = D*h*Lorentz;
 
-      while(fabs(f) > 0.00000001)
+      F  = 1.0;
+      dF = 1.0;
+
+      count = 0;
+   
+      while(F > 0.000000001)
       {
-      #if EOS == IDEAL
-         h    = 1.0 + (K / (K - 1.0))*theta_0;
-         derh = K / (K - 1.0);
-      #elif EOS == DUST
-         h    = 1.0;
-         derh = 0.0;
-      #elif EOS == STIFF
-         h    = (K / (K - 1.0))*theta_0;
-         derh = K / (K - 1.0);
-      #endif
+         Lorentz    = 1.0/sqrt(1.0 - SS/(x_0));
+         derLorentz = - SS*pow(Lorentz/x,3.0);
 
-         Lorentz = sqrt(1.0 + SS/(D*D*h*h));
+         #if EOS == IDEAL
+         F  = x_0 - (K - 1.0)*(x_0 - Lorentz*D)/(K*Lorentz*Lorentz) - tau - D; 
+         dF = 1.0 - (K - 1.0)*((1.0 - derLorentz*D)*Lorentz*Lorentz - 2.0*Lorentz*derLorentz*(x_0 - Lorentz*D))/(K*pow(Lorentz,4.0));
+         #endif
 
-         f    = h*Lorentz - (theta_0/Lorentz) - (tau/D) - 1.0;
-         derf = (1.0/Lorentz)*(derh - 1.0 - theta_0*((Lorentz*Lorentz - 1.0)/(Lorentz*Lorentz))*(derh/h));
+         x = x_0 - F/dF;
 
-         theta   = theta_0 - f/derf;
-         theta_0 = theta;
+         x_0 = x;
+
          count++;
+
+         printf("%e %e %e %e %e %e\n",x,Lorentz,F,dF,grid.X1[i],h);
+         getchar();
 
          if(count == 100000)
          {
@@ -88,19 +93,15 @@ int Cons2Prim(double *u, double *q)
          }
       }
 
+      Lorentz = 1.0/sqrt(1.0 - SS/(x*x));
+
       #if EOS == IDEAL
-      h    = 1.0 + (K / (K - 1.0))*theta_0;
-      #elif EOS == DUST
-      h    = 1.0;
-      #elif EOS == STIFF
-      h    = (K / (K - 1.0))*theta_0;
+      p    = ((K - 1.0)/K)*(x - Lorentz*D)/(Lorentz*Lorentz);
       #endif
 
-      Lorentz = sqrt(1.0 + SS/(D*D*h*h));
-
-      u(0,i) = D / Lorentz;
-      u(1,i) = D*h*Lorentz - tau - D;
-      u(2,i) = S_cov[0]/(D*h*Lorentz);
+      u(RHO,i) = D/Lorentz;
+      u(PRE,i) = p;
+      u(VX1,i) = S_cov[0]/x;
    }
 
 #elif DIM == 2
@@ -222,11 +223,11 @@ int Cons2Prim(double *u, double *q)
          
          SS = S_cov[0]*S_con[0] + S_cov[1]*S_con[1] + S_cov[2]*S_con[2];
 
-         theta_0 = U(PRE,i,j)/U(RHO,i,j);
+         theta_0 = U(1,i,j)/U(0,i,j);
          f       = 1.0;
          count   = 0;
 
-         while(fabs(f) > 0.0000001)
+         while(fabs(f) > 0.00000001)
          {
          #if EOS == IDEAL
             h    = 1.0 + (K / (K - 1.0))*theta_0;
@@ -252,7 +253,7 @@ int Cons2Prim(double *u, double *q)
             {
                printf("                                          \n");
                printf("Spend too much time in Newton-Rhapson.\n");
-               printf("%d %d %e %e %e %e\n",i,j,D,tau,SS,f);
+               printf("%e %e %e %e %e %e\n",f,theta,SS,Lorentz,grid.X1[i],grid.X2[j]);
                CHECK_NAN = TRUE;
                U = U0;
                PrintValues(&grid.time,&theta,&CHECK_NAN);

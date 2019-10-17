@@ -1,12 +1,3 @@
-/**
- * @file /RHD/q2uvector.c
- *
- * @author Alejandro Aguayo-Ortiz
- *
- * @brief Function that convert from Conservative to Primitives (RHD).
- *
- */
-
 #include"main.h"
     
 int Cons2Prim(double *u, double *q)
@@ -53,9 +44,9 @@ int Cons2Prim(double *u, double *q)
 
       theta_0 = U(1,i)/U(0,i);
       f       = 1.0;
-      count   = 0;
+      count  = 0;
 
-      while(fabs(f) > 0.00000001)
+      while(fabs(f) > 0.00000001 && count <= 100000)
       {
       #if EOS == IDEAL
          h    = 1.0 + (K / (K - 1.0))*theta_0;
@@ -63,9 +54,6 @@ int Cons2Prim(double *u, double *q)
       #elif EOS == DUST
          h    = 1.0;
          derh = 0.0;
-      #elif EOS == STIFF
-         h    = (K / (K - 1.0))*theta_0;
-         derh = K / (K - 1.0);
       #endif
 
          Lorentz = sqrt(1.0 + SS/(D*D*h*h));
@@ -76,24 +64,12 @@ int Cons2Prim(double *u, double *q)
          theta   = theta_0 - f/derf;
          theta_0 = theta;
          count++;
-
-         if(count == 100000)
-         {
-            printf("                                          \n");
-            printf("Spend too much time in Newton-Rhapson.\n");
-            CHECK_NAN = TRUE;
-            U = U0;
-            PrintValues(&grid.time,&theta,&CHECK_NAN);
-            exit(EXIT_FAILURE);
-         }
       }
 
       #if EOS == IDEAL
       h    = 1.0 + (K / (K - 1.0))*theta_0;
       #elif EOS == DUST
       h    = 1.0;
-      #elif EOS == STIFF
-      h    = (K / (K - 1.0))*theta_0;
       #endif
 
       Lorentz = sqrt(1.0 + SS/(D*D*h*h));
@@ -141,7 +117,7 @@ int Cons2Prim(double *u, double *q)
          f       = 1.0;
          count   = 0;
 
-         while(fabs(f) > 0.00000001)
+         while(fabs(f) > 0.00000001 && count <= 100000)
          {
          #if EOS == IDEAL
             h    = 1.0 + (K / (K - 1.0))*theta_0;
@@ -149,9 +125,6 @@ int Cons2Prim(double *u, double *q)
          #elif EOS == DUST
             h    = 1.0;
             derh = 0.0;
-         #elif EOS == STIFF
-            h    = (K / (K - 1.0))*theta_0;
-            derh = K / (K - 1.0);
          #endif
 
             Lorentz = sqrt(1.0 + SS/(D*D*h*h));
@@ -162,24 +135,12 @@ int Cons2Prim(double *u, double *q)
             theta   = theta_0 - f/derf;
             theta_0 = theta;
             count++;
-
-            if(count == 100000)
-            {
-               printf("                                          \n");
-               printf("Spend too much time in Newton-Rhapson.\n");
-               CHECK_NAN = TRUE;
-               U = U0;
-               PrintValues(&grid.time,&theta,&CHECK_NAN);
-               exit(EXIT_FAILURE);
-            }
          }
 
          #if EOS == IDEAL
          h    = 1.0 + (K / (K - 1.0))*theta_0;
          #elif EOS == DUST
          h    = 1.0;
-         #elif EOS == STIFF
-         h    = (K / (K - 1.0))*theta_0;
          #endif
 
          Lorentz = sqrt(1.0 + SS/(D*D*h*h));
@@ -222,11 +183,11 @@ int Cons2Prim(double *u, double *q)
          
          SS = S_cov[0]*S_con[0] + S_cov[1]*S_con[1] + S_cov[2]*S_con[2];
 
-         theta_0 = U(PRE,i,j)/U(RHO,i,j);
+         theta_0 = U(1,i,j)/U(0,i,j);
          f       = 1.0;
          count   = 0;
 
-         while(fabs(f) > 0.0000001)
+         while(fabs(f) > 0.00000001 && count <= 100000)
          {
          #if EOS == IDEAL
             h    = 1.0 + (K / (K - 1.0))*theta_0;
@@ -234,9 +195,6 @@ int Cons2Prim(double *u, double *q)
          #elif EOS == DUST
             h    = 1.0;
             derh = 0.0;
-         #elif EOS == STIFF
-            h    = (K / (K - 1.0))*theta_0;
-            derh = K / (K - 1.0);
          #endif
 
             Lorentz = sqrt(1.0 + SS/(D*D*h*h));
@@ -247,25 +205,12 @@ int Cons2Prim(double *u, double *q)
             theta   = theta_0 - f/derf;
             theta_0 = theta;
             count++;
-
-            if(count == 10000000)
-            {
-               printf("                                          \n");
-               printf("Spend too much time in Newton-Rhapson.\n");
-               printf("%d %d %e %e %e %e\n",i,j,D,tau,SS,f);
-               CHECK_NAN = TRUE;
-               U = U0;
-               PrintValues(&grid.time,&theta,&CHECK_NAN);
-               exit(EXIT_FAILURE);
-            }
          }
 
          #if EOS == IDEAL
          h    = 1.0 + (K / (K - 1.0))*theta_0;
          #elif EOS == DUST
          h    = 1.0;
-         #elif EOS == STIFF
-         h    = (K / (K - 1.0))*theta_0;
          #endif
 
          Lorentz = sqrt(1.0 + SS/(D*D*h*h));
