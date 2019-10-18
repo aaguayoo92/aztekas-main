@@ -31,44 +31,46 @@ int RK1D(double *u, double *q, double *q1, double *q2, int order)
    vec_ v;
    lim_ l;
 
+   #pragma omp parallel
+   #pragma omp for schedule (guided)
    for(i = gc; i <= Nx1-gc; i++)
    {
-      I[0] = i;
- 
-      Dx1 = grid.X1p[i] - grid.X1m[i];
-
-      Reconst1D(u,&l,I);
-      Sources(l.ux,&v,I);
-      Flux1D(&v,&l,I);
- 
-      for(n = 0; n < eq; n++)
-      {
-         F[n] = (S1p(i)*v.Fp[n] - S1m(i)*v.Fm[n])/(Dx1) - \
-         v.S[n];
-      }
-
-#if INTEGRATION == PVRS //PVRS
-      for(n = 0; n < eq; n++)
-      {
-         L[n] = F[n];
-      }
-
-      MxV(v.A,L,F);
-#endif
-
+//      I[0] = i;
+// 
+//      Dx1 = grid.X1p[i] - grid.X1m[i];
+//
+//      Reconst1D(u,&l,I);
+//      Sources(l.ux,&v,I);
+//      Flux1D(&v,&l,I);
+// 
+//      for(n = 0; n < eq; n++)
+//      {
+//         F[n] = (S1p(i)*v.Fp[n] - S1m(i)*v.Fm[n])/(Dx1) - \
+//         v.S[n];
+//      }
+//
+//#if INTEGRATION == PVRS //PVRS
+//      for(n = 0; n < eq; n++)
+//      {
+//         L[n] = F[n];
+//      }
+//
+//      MxV(v.A,L,F);
+//#endif
+//
       switch(order)
       {
          case 1:
             for(n = 0; n < eq; n++)
             {
-               q1(n,i) = q(n,i) - (Dt)*(F[n]);
+               q1(n,i) = 1.0;//q(n,i) - (Dt)*(F[n]);
             }
          break;
 
          case 2:
             for(n = 0; n < eq; n++)
             {
-               q2(n,i) = 0.5*(q1(n,i) + q(n,i) - (Dt)*F[n]);
+               q2(n,i) = 1.0;//0.5*(q1(n,i) + q(n,i) - (Dt)*F[n]);
             }
          break;
       }

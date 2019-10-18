@@ -25,6 +25,7 @@ void Initial()
    /////////////////////////////
 
    #pragma omp parallel
+   #pragma omp for
    for(i = 0; i <= Nx1; i++)
    {
       if(grid.X1[i] < x_0)
