@@ -69,7 +69,8 @@ include $(AZTPATH)/Src/Makefile
 # Compilation
 ###############################################
 
-FLAGS = -Ofast -lm 
+FLAGS = -Ofast -lm -fopenmp
+OMP_NUM = 1
 
 COMPILER = gcc
 AZT_HEAD = $(AZTPATH)/Src/Headers
@@ -80,6 +81,7 @@ all:
 	@echo ""
 	@echo "Compiling problem file ..."
 	$(COMPILER) $(PARAM) $(MAIN) $(USR) $(PHYSICS) $(HEADERS) $(FLAGS) -o $(EXEC)  
+	export OMP_NUM_THREADS=$(OMP_NUM)
 	@echo ""
 	@echo "aztekas compiled successfully"
 	

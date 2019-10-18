@@ -24,6 +24,7 @@ void Initial()
    //-------Riemann-1D--------//
    /////////////////////////////
 
+   #pragma omp parallel
    for(i = 0; i <= Nx1; i++)
    {
       if(grid.X1[i] < x_0)
