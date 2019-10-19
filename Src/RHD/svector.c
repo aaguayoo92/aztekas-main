@@ -1,6 +1,6 @@
 #include"main.h"
     
-void Source_Terms(double *s, double *u, gauge_ local_grid)
+void Source_Terms(double *s, double *u, gauge_ *local_grid)
 {
    int i;
    double rho, p, v_cov[3], v_con[3];
@@ -28,15 +28,15 @@ void Source_Terms(double *s, double *u, gauge_ local_grid)
 #endif
 
    // Contravariant components of the 3-velocity
-   v_con[0] = local_grid.gamma_con[0][0]*v_cov[0] + \
-              local_grid.gamma_con[0][1]*v_cov[1] + \
-              local_grid.gamma_con[0][2]*v_cov[2];
-   v_con[1] = local_grid.gamma_con[1][0]*v_cov[0] + \
-              local_grid.gamma_con[1][1]*v_cov[1] + \
-              local_grid.gamma_con[1][2]*v_cov[2];
-   v_con[2] = local_grid.gamma_con[2][0]*v_cov[0] + \
-              local_grid.gamma_con[2][1]*v_cov[1] + \
-              local_grid.gamma_con[2][2]*v_cov[2];
+   v_con[0] = local_grid->gamma_con[0][0]*v_cov[0] + \
+              local_grid->gamma_con[0][1]*v_cov[1] + \
+              local_grid->gamma_con[0][2]*v_cov[2];
+   v_con[1] = local_grid->gamma_con[1][0]*v_cov[0] + \
+              local_grid->gamma_con[1][1]*v_cov[1] + \
+              local_grid->gamma_con[1][2]*v_cov[2];
+   v_con[2] = local_grid->gamma_con[2][0]*v_cov[0] + \
+              local_grid->gamma_con[2][1]*v_cov[1] + \
+              local_grid->gamma_con[2][2]*v_cov[2];
 
    // Contraction v_i v^i
    VV = v_con[0]*v_cov[0] + v_con[1]*v_cov[1] + v_con[2]*v_cov[2];
@@ -83,21 +83,21 @@ void Source_Terms(double *s, double *u, gauge_ local_grid)
    double U_dlapse3;
    der_gauge_ der;
 
-   Gauge_Derivatives(&der,&local_grid);
+   Gauge_Derivatives(&der,local_grid);
 
-   lapse     = local_grid.lapse;
-   beta[0]   = local_grid.beta_con[0];
-   beta[1]   = local_grid.beta_con[1];
-   beta[2]   = local_grid.beta_con[2];
-   gam[0][0] = local_grid.gamma_con[0][0];
-   gam[0][1] = local_grid.gamma_con[0][1];
-   gam[0][2] = local_grid.gamma_con[0][2];
-   gam[1][0] = local_grid.gamma_con[1][0];
-   gam[1][1] = local_grid.gamma_con[1][1];
-   gam[1][2] = local_grid.gamma_con[1][2];
-   gam[2][0] = local_grid.gamma_con[2][0];
-   gam[2][1] = local_grid.gamma_con[2][1];
-   gam[2][2] = local_grid.gamma_con[2][2];
+   lapse     = local_grid->lapse;
+   beta[0]   = local_grid->beta_con[0];
+   beta[1]   = local_grid->beta_con[1];
+   beta[2]   = local_grid->beta_con[2];
+   gam[0][0] = local_grid->gamma_con[0][0];
+   gam[0][1] = local_grid->gamma_con[0][1];
+   gam[0][2] = local_grid->gamma_con[0][2];
+   gam[1][0] = local_grid->gamma_con[1][0];
+   gam[1][1] = local_grid->gamma_con[1][1];
+   gam[1][2] = local_grid->gamma_con[1][2];
+   gam[2][0] = local_grid->gamma_con[2][0];
+   gam[2][1] = local_grid->gamma_con[2][1];
+   gam[2][2] = local_grid->gamma_con[2][2];
 
    Su[0] = S_con[0];
    Su[1] = S_con[1];

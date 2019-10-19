@@ -29,6 +29,13 @@ int CHECK_NAN;
 /* Define pointers */
 double *U, *U0, *U1, *U2, *U3;
 double *Q, *Q1, *Q2, *Q3;
+//typedef struct
+//{
+//   double *U, *U0;
+//   double *Q, *Q1, *Q2, *Q3;
+//}solution_;
+
+//solution_ aztekas_Vec;
 
 double start, delta;
 double K;
@@ -50,7 +57,10 @@ int Boundaries(double *B);
 
 void Integration();
 
-int RK1D(double *u, double *q, double *q1, double *q2, int order);
+void Runge_Kutta(int order);
+
+//int RK1D(double *u, double *q, double *q1, double *q2, int order);
+void RK1D(int order);
 
 int RK2D(double *u, double *q, double *q1, double *q2, int order);
 

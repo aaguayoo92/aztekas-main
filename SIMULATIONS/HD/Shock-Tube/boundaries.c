@@ -2,7 +2,7 @@
  * File Name : boundaries.c
  * Description : aztekas boundaries module for Shock-Tube
  * Creation Date : 26-09-2019
- * Last Modified : 26-09-2019 23:57:13
+ * Last Modified : 18-10-2019 18:21:45
  * Created By :
  */
 
@@ -19,11 +19,11 @@ int Boundaries(double *B)
    Outflow(B);
    
    // Linear extrapolation. Important for the diagonal shock tube
-   for(i = 0; i <= Nx1; i++)
+   for(n = 0; n < eq; n++)
    {
-      for(j = 0; j <= Nx2; j++)
+      for(i = gc; i <= Nx1-gc; i++)
       {
-         for(n = 0; n < eq; n++)
+         for(j = gc; j <= Nx2-gc; j++)
          {
             if(i > Nx1-gc)
             {
@@ -35,26 +35,22 @@ int Boundaries(double *B)
             }
          }
       }
-   }
 
-   for(i = Nx1; i >= 0; i--)
-   {
-      for(j = Nx2; j <= 0; j--)
+      for(i = Nx1-gc; i >= gc; i--)
       {
-         for(n = 0; n < eq; n++)
+         for(j = Nx2-gc; j >= gc; j--)
          {
-            if(i > Nx1-gc)
+            if(i < gc)
             {
                B(n,i,j) = B(n,i+2,j) + ((grid.X1[i] - grid.X1[i+2])/(grid.X1[i+1] - grid.X1[i+2]))*(B(n,i+1,j) - B(n,i+2,j)); 
             }
-            if(j > Nx2-gc)
+            if(j < gc)
             {
                B(n,i,j) = B(n,i,j+2) + ((grid.X2[j] - grid.X2[j+2])/(grid.X2[j+1] - grid.X2[j+2]))*(B(n,i,j+1) - B(n,i,j+2)); 
             }
          }
       }
    }
-   
 #endif
 
    return 0;

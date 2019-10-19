@@ -16,30 +16,32 @@
  */
 void Outflow(double *B)
 {
-   int i, j, k, n, cell;
-   
 #if DIM == 1
 
    //////////////////////////////////////////////////////////
    ///////////////////// Outflow-1D /////////////////////////
    //////////////////////////////////////////////////////////
 
-   for(cell = 0; cell < gc; cell++)
+   #pragma omp parallel
    {
-      for(n = 0; n < eq; n++)
+      #pragma omp for collapse(2)
+      for(int cell = 0; cell < gc; cell++)
       {
-         // r = 0 boundary in cylindrical and spherical coordinates
-      #if COORDINATES != CARTESIAN && outflow_x1min == TRUE
-         if(x1min == 0.0)
-            B(n,gc) = B(n,gc+1);
-      #endif
+         for(int n = 0; n < eq; n++)
+         {
+            // r = 0 boundary in cylindrical and spherical coordinates
+         #if COORDINATES != CARTESIAN && outflow_x1min == TRUE
+            if(x1min == 0.0)
+               B(n,gc) = B(n,gc+1);
+         #endif
 
-      #if outflow_x1max == TRUE
-         B(n,Nx1-cell) = B(n,Nx1-gc); //x1max
-      #endif
-      #if outflow_x1min == TRUE
-         B(n,cell) = B(n,gc); //x1min
-      #endif
+         #if outflow_x1max == TRUE
+            B(n,Nx1-cell) = B(n,Nx1-gc); //x1max
+         #endif
+         #if outflow_x1min == TRUE
+            B(n,cell) = B(n,gc); //x1min
+         #endif
+         }
       }
    }
    //////////////////////////////////////////////////////////
@@ -51,24 +53,28 @@ void Outflow(double *B)
    //////////////////////////////////////////////////////////
 
    // Outflow in X1 //
-   for(j = 0; j <= Nx2; j++)
+   #pragma omp parallel
    {
-      for(cell = 0; cell <= gc; cell++)
+      #pragma omp for collapse(3)
+      for(int j = 0; j <= Nx2; j++)
       {
-         for(n = 0; n < eq; n++)
+         for(int cell = 0; cell <= gc; cell++)
          {
-         // r = 0 boundary in cylindrical and spherical coordinates
-         #if COORDINATES != CARTESIAN && outflow_x1min == TRUE
-            if(x1min == 0.0) 
-                B(n,gc,j) = B(n,gc+1,j);
-         #endif
+            for(int n = 0; n < eq; n++)
+            {
+            // r = 0 boundary in cylindrical and spherical coordinates
+            #if COORDINATES != CARTESIAN && outflow_x1min == TRUE
+               if(x1min == 0.0) 
+                   B(n,gc,j) = B(n,gc+1,j);
+            #endif
 
-         #if outflow_x1max == TRUE
-            B(n,Nx1-cell,j) = B(n,Nx1-gc,j); //x1max
-         #endif
-         #if outflow_x1min == TRUE
-            B(n,cell,j) = B(n,gc,j); //x1min
-         #endif
+            #if outflow_x1max == TRUE
+               B(n,Nx1-cell,j) = B(n,Nx1-gc,j); //x1max
+            #endif
+            #if outflow_x1min == TRUE
+               B(n,cell,j) = B(n,gc,j); //x1min
+            #endif
+            }
          }
       }
    }
@@ -77,28 +83,32 @@ void Outflow(double *B)
    ///////////////////
    // Outflow in X2 //
    ///////////////////
-   for(i = 0; i <= Nx1; i++)
+   #pragma omp parallel
    {
-      for(cell = 0; cell <= gc; cell++)
+      #pragma omp for collapse(3)
+      for(int cell = 0; cell <= gc; cell++)
       {
-         for(n = 0; n < eq; n++)
+         for(int i = 0; i <= Nx1; i++)
          {
-         // theta = 0 or M_PI boundary in spherical coordinates
-         #if COORDINATES == SPHERICAL && outflow_x2max == TRUE
-            if(x2max/M_PI == 1.0)
-               B(n,i,Nx2-gc) = B(n,i,Nx2-gc-1); //x2max
-         #endif
-         #if COORDINATES == SPHERICAL && outflow_x2max == TRUE
-            if(x2min/M_PI == 0.0)
-               B(n,i,gc) = B(n,i,gc+1); //x2min
-         #endif
+            for(int n = 0; n < eq; n++)
+            {
+            // theta = 0 or M_PI boundary in spherical coordinates
+            #if COORDINATES == SPHERICAL && outflow_x2max == TRUE
+               if(x2max/M_PI == 1.0)
+                  B(n,i,Nx2-gc) = B(n,i,Nx2-gc-1); //x2max
+            #endif
+            #if COORDINATES == SPHERICAL && outflow_x2max == TRUE
+               if(x2min/M_PI == 0.0)
+                  B(n,i,gc) = B(n,i,gc+1); //x2min
+            #endif
 
-         #if outflow_x2max == TRUE
-            B(n,i,Nx2-cell) = B(n,i,Nx2-gc); //x2max
-         #endif
-         #if outflow_x2min == TRUE
-            B(n,i,cell) = B(n,i,gc); //x2min
-         #endif
+            #if outflow_x2max == TRUE
+               B(n,i,Nx2-cell) = B(n,i,Nx2-gc); //x2max
+            #endif
+            #if outflow_x2min == TRUE
+               B(n,i,cell) = B(n,i,gc); //x2min
+            #endif
+            }
          }
       }
    }

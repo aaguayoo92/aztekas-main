@@ -15,6 +15,8 @@ typedef struct
 typedef struct
 {
 	double A[eq*eq];
+	double U[eq+1];
+	double Q[eq+1];
 	double S[eq+1];
 	double Fp[eq+1];
 	double Fm[eq+1];
@@ -35,21 +37,22 @@ typedef struct
 
 int funct_A(double *a, double *uu);
 int Cons2Prim(double *q, double *u);
+//void Cons2Prim(double *u, double *q, gauge_ local_grid);
 
 void Prim2Cons_All(double *u, double *q);
 
-void Prim2Cons(double *q, double *u, gauge_ local_grid);
-void Prim2FluxF(double *f, double *v, double *u, gauge_ local_grid);
-void Prim2FluxG(double *f, double *v, double *u, gauge_ local_grid);
-void Prim2FluxH(double *f, double *v, double *u, gauge_ local_grid);
+void Prim2Cons(double *q, double *u, gauge_ *local_grid);
+void Prim2FluxF(double *f, double *v, double *u, gauge_ *local_grid);
+void Prim2FluxG(double *f, double *v, double *u, gauge_ *local_grid);
+void Prim2FluxH(double *f, double *v, double *u, gauge_ *local_grid);
 
-void Sources(double *u, vec_ *v, int *I);
-void Source_Terms(double *s, double *u, gauge_ local_grid);
-void User_Source_Terms(double *s, double *u, gauge_ local_grid);
+void Prim2Sources(double *s, double *u, gauge_ *local_grid);
+void Source_Terms(double *s, double *u, gauge_ *local_grid);
+void User_Source_Terms(double *s, double *u, gauge_ *local_grid);
 
 void Matrix_A(double *a, double *u, gauge_ local_grid);
 
-void EoS(eos_ *e, double *u, gauge_ local_grid);
+void EoS(eos_ *e, double *u, gauge_ *local_grid);
 
 void Get_Metric_Components(gauge_ *local_grid);
 void Gauge_Derivatives(der_gauge_ *der, gauge_ *local_grid);

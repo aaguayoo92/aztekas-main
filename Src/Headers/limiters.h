@@ -23,6 +23,7 @@ typedef struct
 	double ux3m[2*eq];
 	double sx3[2*eq];
 	double ux[2*eq];
+   double U[eq+1];
 }lim_;
 
 double Limiter(double A, double B, int r);

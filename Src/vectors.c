@@ -6,49 +6,19 @@
 //Do not erase any of these libraries//
 #include"main.h"
 
-void Sources(double *u, vec_ *v, int *I)
+void Prim2Sources(double *s, double *u, gauge_ *local_grid)
 {
    int n;
-   double x[4];
-   double default_S[eq+1];
-   gauge_ local_grid;
+   double default_S[10];
 #if GRAVITY != NONE
-   double grav_S[eq+1];
+   double grav_S[10];
 #endif
 #if USER_SOURCE_TERMS == TRUE
-   double user_S[eq+1];
-#endif
-
-   local_grid.x[0] = grid.time;
-
-#if DIM == 1
-
-   local_grid.x[1] = grid.X1[I[0]];
-   local_grid.x[2] = 0.0;
-   local_grid.x[3] = 0.0;
-   #if COORDINATES == SPHERICAL
-   local_grid.x[2] = M_PI_2;
-   #endif
-
-#elif DIM == 2 || DIM == 4
-
-   local_grid.x[1] = grid.X1[I[0]];
-   local_grid.x[2] = grid.X2[I[1]];
-   local_grid.x[3] = 0.0;
-   #if POLAR == TRUE
-   local_grid.x[2] = M_PI_2;
-   #endif
-
-#elif DIM == 3
-
-   local_grid.x[1] = grid.X1[I[0]];
-   local_grid.x[2] = grid.X2[I[1]];
-   local_grid.x[3] = grid.X3[I[2]];
-
+   double user_S[10];
 #endif
 
 #if PHYSICS == RHD
-   Get_Metric_Components(&local_grid);
+   Get_Metric_Components(local_grid);
 #endif
 
    // Geometric source terms
@@ -60,10 +30,10 @@ void Sources(double *u, vec_ *v, int *I)
 
    for(n = 0; n < eq; n++)
    {
-      v->S[n] = default_S[n];
+      s[n] = default_S[n];
 
    #if USER_SOURCE_TERMS == TRUE
-      v->S[n] += user_S[n];
+      s[n] += user_S[n];
    #endif
    }
 
@@ -171,27 +141,27 @@ int VECTOR(int pm, char flux, lim_ *l, flx_ *f, int *I)
       f->um[n] = u[0*eq + n];
    }
 
-   Prim2Cons(f->qp,f->up,local_grid);
-   Prim2Cons(f->qm,f->um,local_grid);
+   Prim2Cons(f->qp,f->up,&local_grid);
+   Prim2Cons(f->qm,f->um,&local_grid);
 
    switch(flux)
    {
       case 'f':
-         Prim2FluxF(f->fp,dp,f->up,local_grid);
+         Prim2FluxF(f->fp,dp,f->up,&local_grid);
 
-         Prim2FluxF(f->fm,dm,f->um,local_grid);
+         Prim2FluxF(f->fm,dm,f->um,&local_grid);
       break;
 
       case 'g':
-         Prim2FluxG(f->fp,dp,f->up,local_grid);
+         Prim2FluxG(f->fp,dp,f->up,&local_grid);
 
-         Prim2FluxG(f->fm,dm,f->um,local_grid);
+         Prim2FluxG(f->fm,dm,f->um,&local_grid);
       break;
 
       case 'h':
-         Prim2FluxH(f->fp,dp,f->up,local_grid);
+         Prim2FluxH(f->fp,dp,f->up,&local_grid);
 
-         Prim2FluxH(f->fm,dm,f->um,local_grid);
+         Prim2FluxH(f->fm,dm,f->um,&local_grid);
       break;
    }
 

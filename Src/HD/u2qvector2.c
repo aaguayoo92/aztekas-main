@@ -32,7 +32,7 @@ void Prim2Cons_All(double *q, double *u)
          P[0] = rho;
          P[1] = p;
 
-         EoS(&eos,P,&local_grid);
+         EoS(&eos,P,local_grid);
 
          E = 0.5 * rho * (vx1*vx1 + vx2*vx2 + vx3*vx3) + rho*eos.e;
 

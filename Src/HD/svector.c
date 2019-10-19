@@ -1,8 +1,8 @@
 #include"main.h"
     
-void Source_Terms(double *s, double *u, gauge_ local_grid)
+void Source_Terms(double *s, double *u, gauge_ *local_grid)
 {
-   double rho, p, vx1=0, vx2=0, vx3=0;
+   double rho, p, vx1=0.0, vx2=0.0, vx3=0.0;
 
    rho = u[0];
    p   = u[1];
@@ -20,10 +20,10 @@ void Source_Terms(double *s, double *u, gauge_ local_grid)
 
 #if COORDINATES == CARTESIAN
 
-   double t = local_grid.x[0];
-   double X = local_grid.x[1];
-   double Y = local_grid.x[2];
-   double Z = local_grid.x[3];
+   double t = local_grid->x[0];
+   double X = local_grid->x[1];
+   double Y = local_grid->x[2];
+   double Z = local_grid->x[3];
 
    s[0] = 0.0;
    s[1] = 0.0;
@@ -33,10 +33,10 @@ void Source_Terms(double *s, double *u, gauge_ local_grid)
 
 #elif COORDINATES == CYLINDRICAL
 
-   double t   = local_grid.x[0];
-   double R   = local_grid.x[1];
-   double Z   = local_grid.x[2];
-   double phi = local_grid.x[3];
+   double t   = local_grid->x[0];
+   double R   = local_grid->x[1];
+   double Z   = local_grid->x[2];
+   double phi = local_grid->x[3];
 
    s[0] = 0;
    s[1] = 0;
@@ -48,10 +48,10 @@ void Source_Terms(double *s, double *u, gauge_ local_grid)
 
    double E;
    eos_ eos;
-   double t     = local_grid.x[0];
-   double r     = local_grid.x[1];
-   double theta = local_grid.x[2];
-   double phi   = local_grid.x[3];
+   double t     = local_grid->x[0];
+   double r     = local_grid->x[1];
+   double theta = local_grid->x[2];
+   double phi   = local_grid->x[3];
 
    EoS(&eos,u,local_grid);
 

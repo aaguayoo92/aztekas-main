@@ -18,106 +18,48 @@
 
 #if DIM == 1
 
-int RK1D(double *u, double *q, double *q1, double *q2, int order)
+//int RK1D(double *U, double *Q, double *Q1, double *Q2, int order)
+void RK1D(int order)
 {
    char r;
-   int n, i;
    int I[3];
    double Dx1 = dx1;
    double Dt  = dt;
-   double L[eq+1], F[eq+1];
-   double UU[eq+1];
+   double L[eq+1], F[eq+1], Prim[eq+1];
    double g[6], g1p[6], g1m[6];
+   gauge_ local_grid;
    vec_ v;
    lim_ l;
 
-   #pragma omp parallel
-   #pragma omp for schedule (guided)
-   for(i = gc; i <= Nx1-gc; i++)
+   #pragma omp parallel shared(U,Q,Q1,Q2,grid,Dt) if (OMP_NUM > 1)
    {
-//      I[0] = i;
-// 
-//      Dx1 = grid.X1p[i] - grid.X1m[i];
-//
-//      Reconst1D(u,&l,I);
-//      Sources(l.ux,&v,I);
-//      Flux1D(&v,&l,I);
-// 
-//      for(n = 0; n < eq; n++)
-//      {
-//         F[n] = (S1p(i)*v.Fp[n] - S1m(i)*v.Fm[n])/(Dx1) - \
-//         v.S[n];
-//      }
-//
-//#if INTEGRATION == PVRS //PVRS
-//      for(n = 0; n < eq; n++)
-//      {
-//         L[n] = F[n];
-//      }
-//
-//      MxV(v.A,L,F);
-//#endif
-//
-      switch(order)
+      #pragma omp for private(I,l,v,F,L,Prim,Dx1,local_grid) 
+      for(int i = gc; i <= Nx1-gc; i++)
       {
-         case 1:
-            for(n = 0; n < eq; n++)
-            {
-               q1(n,i) = 1.0;//q(n,i) - (Dt)*(F[n]);
-            }
-         break;
+         local_grid.x[0] = grid.time;
+         local_grid.x[1] = grid.X1[i];
+         local_grid.x[2] = 0.0;
+         local_grid.x[3] = 0.0;
+         #if COORDINATES == SPHERICAL
+         local_grid.x[2] = M_PI_2;
+         #endif
 
-         case 2:
-            for(n = 0; n < eq; n++)
-            {
-               q2(n,i) = 1.0;//0.5*(q1(n,i) + q(n,i) - (Dt)*F[n]);
-            }
-         break;
-      }
-   }
-
-   return 0;
-}
-
-#elif DIM == 2 || DIM == 4
-
-int RK2D(double *u, double *q, double *q1, double *q2, int order)
-{
-   char r;
-   int n, i, j;
-   int I[3];
-   double Dx1 = dx1;
-   double Dx2 = dx2;
-   double Dt  = dt;
-   double L[eq+1], F[eq+1];
-   double g[6], g1p[6], g1m[6];
-   double g2p[6], g2m[6];
-   vec_ v;
-   lim_ l;
-
-   for(i = gc; i <= Nx1-gc; i++)
-   {
-      for(j = gc; j <= Nx2-gc; j++)
-      {
          I[0] = i;
-         I[1] = j;
-
+    
          Dx1 = grid.X1p[i] - grid.X1m[i];
-         Dx2 = grid.X2p[j] - grid.X2m[j];
 
-         Reconst2D(u,&l,I);
-         Sources(l.ux,&v,I);
-         Flux2D(&v,&l,I);
-
-         for(n = 0; n < eq; n++)
+         Reconst1D(U,&l,I);
+         Flux1D(&v,&l,I);
+         Prim2Sources(v.S,l.ux,&local_grid);
+    
+         for(int n = 0; n < eq; n++)
          {
-            F[n] = (S1p(i,j)*v.Fp[n] - S1m(i,j)*v.Fm[n])/(Dx1) + \
-                   (S2p(i,j)*v.Gp[n] - S2m(i,j)*v.Gm[n])/(Dx2) - \
-                   v.S[n];
+            F[n] = (S1p(i)*v.Fp[n] - S1m(i)*v.Fm[n])/(Dx1) - \
+            v.S[n];
          }
 
 #if INTEGRATION == PVRS //PVRS
-         for(n = 0; n < eq; n++)
+         for(int n = 0; n < eq; n++)
          {
             L[n] = F[n];
          }
@@ -128,18 +70,87 @@ int RK2D(double *u, double *q, double *q1, double *q2, int order)
          switch(order)
          {
             case 1:
-               for(n = 0; n < eq; n++)
+               for(int n = 0; n < eq; n++)
                {
-                  q1(n,i,j) = q(n,i,j) - (Dt)*(F[n]);
+                  Q1(n,i) = Q(n,i) - (Dt)*(F[n]);
                }
             break;
 
             case 2:
-               for(n = 0; n < eq; n++)
+               for(int n = 0; n < eq; n++)
                {
-                  q2(n,i,j) = 0.5*(q1(n,i,j) + q(n,i,j) - (Dt)*F[n]);
+                  Q2(n,i) = 0.5*(Q1(n,i) + Q(n,i) - (Dt)*F[n]);
                }
             break;
+         }
+      }
+   }
+}
+
+#elif DIM == 2 || DIM == 4
+
+int RK2D(double *u, double *q, double *q1, double *q2, int order)
+{
+   char r;
+   int I[3];
+   double Dx1 = dx1;
+   double Dx2 = dx2;
+   double Dt  = dt;
+   double L[eq+1], F[eq+1];
+   double g[6], g1p[6], g1m[6];
+   double g2p[6], g2m[6];
+   vec_ v;
+   lim_ l;
+
+   #pragma omp parallel shared(U,grid,Dt) if (OMP_NUM > 1)
+   {
+      #pragma omp for private(I,l,v,F,L,Dx1,Dx2) collapse(2)
+      for(int j = gc; j <= Nx2-gc; j++)
+      {
+         for(int i = gc; i <= Nx1-gc; i++)
+         {
+            I[0] = i;
+            I[1] = j;
+
+            Dx1 = grid.X1p[i] - grid.X1m[i];
+            Dx2 = grid.X2p[j] - grid.X2m[j];
+
+            Reconst2D(u,&l,I);
+            Sources(l.ux,&v,I);
+            Flux2D(&v,&l,I);
+
+            for(int n = 0; n < eq; n++)
+            {
+               F[n] = (S1p(i,j)*v.Fp[n] - S1m(i,j)*v.Fm[n])/(Dx1) + \
+                      (S2p(i,j)*v.Gp[n] - S2m(i,j)*v.Gm[n])/(Dx2) - \
+                      v.S[n];
+            }
+
+#if INTEGRATION == PVRS //PVRS
+            for(int n = 0; n < eq; n++)
+            {
+               L[n] = F[n];
+            }
+
+            MxV(v.A,L,F);
+#endif
+
+            switch(order)
+            {
+               case 1:
+                  for(int n = 0; n < eq; n++)
+                  {
+                     q1(n,i,j) = q(n,i,j) - (Dt)*(F[n]);
+                  }
+               break;
+
+               case 2:
+                  for(int n = 0; n < eq; n++)
+                  {
+                     q2(n,i,j) = 0.5*(q1(n,i,j) + q(n,i,j) - (Dt)*F[n]);
+                  }
+               break;
+            }
          }
       }
    }

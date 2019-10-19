@@ -60,6 +60,13 @@
 #define VX2       3
 #define VX3       4
 
+/* CONSERVATIVE VARIABLES */
+#define DEN       0
+#define ENE       1
+#define MX1       2
+#define MX2       3
+#define MX3       4
+
 /* SIMPLE ARRAY */
 #define a(x,y)   a[(x)*(eq) + (y)]
 
@@ -67,8 +74,15 @@
    #define  S1p(x)  grid.S1p[(x)]
    #define  S1m(x)  grid.S1m[(x)]
 
-   #define  U(N,x)  U[(N)*(Nx1+1) + (x)]
-   #define  Q(N,x)  Q[(N)*(Nx1+1) + (x)]
+   #define  U(N,x)   U[(N)*(Nx1+1) + (x)]
+   #define  Q(N,x)   Q[(N)*(Nx1+1) + (x)]
+   #define  Q1(N,x)  Q1[(N)*(Nx1+1) + (x)]
+   #define  Q2(N,x)  Q2[(N)*(Nx1+1) + (x)]
+//   #define  U(N,x)  aztekas_Vec.U[(N)*(Nx1+1) + (x)]
+//   #define  U0(N,x) aztekas_Vec.U0[(N)*(Nx1+1) + (x)]
+//   #define  Q(N,x)  aztekas_Vec.Q[(N)*(Nx1+1) + (x)]
+//   #define  Q1(N,x) aztekas_Vec.Q1[(N)*(Nx1+1) + (x)]
+//   #define  Q2(N,x) aztekas_Vec.Q2[(N)*(Nx1+1) + (x)]
    #define  B(N,x)  B[(N)*(Nx1+1) + (x)]
    #define  u(N,x)  u[(N)*(Nx1+1) + (x)]
    #define  q(N,x)  q[(N)*(Nx1+1) + (x)]

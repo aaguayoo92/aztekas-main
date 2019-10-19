@@ -43,13 +43,13 @@ DIM = 1
 # Coordinates (cartesian,cylindrical,spherical)
 ###############################################
 
-COORD = cartesian
+COORD = spherical
 
 ###############################################
 # User Source Terms (true,false)
 ###############################################
 
-USER_SOURCE = false
+USER_SOURCE = true
 
 ###############################################
 # Integration method
@@ -70,7 +70,7 @@ include $(AZTPATH)/Src/Makefile
 ###############################################
 
 FLAGS = -Ofast -lm -fopenmp
-OMP_NUM = 4
+PARAM += -DOMP_NUM=4
 
 COMPILER = gcc
 AZT_HEAD = $(AZTPATH)/Src/Headers
@@ -81,7 +81,6 @@ all:
 	@echo ""
 	@echo "Compiling problem file ..."
 	$(COMPILER) $(PARAM) $(MAIN) $(USR) $(PHYSICS) $(HEADERS) $(FLAGS) -o $(EXEC)  
-	export OMP_NUM_THREADS=$(OMP_NUM)
 	@echo ""
 	@echo "aztekas compiled successfully"
 	

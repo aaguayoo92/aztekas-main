@@ -9,7 +9,7 @@
 
 #include"main.h"
     
-void Prim2Cons(double *q, double *u, gauge_ local_grid)
+void Prim2Cons(double *q, double *u, gauge_ *local_grid)
 {
    double E;
    eos_ eos;

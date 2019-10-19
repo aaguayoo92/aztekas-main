@@ -8,7 +8,7 @@
 #include"main.h"
     
 //void Prim2FluxG(double *f, double *v, double *u, double *x)
-void Prim2FluxG(double *f, double *v, double *u, gauge_ local_grid)
+void Prim2FluxG(double *f, double *v, double *u, gauge_ *local_grid)
 {
    double E;
    eos_ eos;

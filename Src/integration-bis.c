@@ -12,24 +12,15 @@
 
 void Integration()
 {
+   int RK_ORDER = 1;
    //Runge-Kutta 2th-Order and Piecewie Polynomial Reconstruction
 #if DIM == 1 
    
-   Prim2Cons_All(Q,U);
-
-//   RK1D(U,Q,Q1,Q2,1);
-   RK1D(1);
-   Cons2Prim(U,Q1);
-   Boundaries(U);
-
-   U0 = U;
-
-//   RK1D(U,Q,Q1,Q2,2);
-   RK1D(2);
-   Cons2Prim(U,Q2);
-   Boundaries(U);
-   
-   U0 = U;
+   for(int order = 1; order <= RK_ORDER; order++)
+   {
+      Runge_Kutta(order);
+      Boundaries(aztekas_Vec.U);
+   }
 
 #elif DIM == 2 || DIM == 4
 
